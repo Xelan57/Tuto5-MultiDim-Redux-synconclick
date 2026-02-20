@@ -38,7 +38,7 @@ class CirclePackD3 {
         console.log("render circle pack...");
 
         // updating color scale domain to match the crime attribute
-        const crimeExtent = d3.extent(visData, d => +d[crimeAttr]);
+        const crimeExtent = d3.extent(visData, d => d[crimeAttr]);
 
         const min = crimeExtent[0];
         const max = crimeExtent[1];
@@ -61,7 +61,7 @@ class CirclePackD3 {
 
         // init d3 hierarchy
         const root = d3.hierarchy(hierarchyData)
-            .sum(d => +d[populationAttr] || 0)
+            .sum(d => d[populationAttr] || 0)
             .sort((a, b) => b.value - a.value);
 
         const packLayout = d3.pack()
@@ -94,7 +94,7 @@ class CirclePackD3 {
                 nodeG.append("circle")
                     .attr("class", "nodeCircle")
                     .attr("r", 0)
-                    .attr("fill", d => d.children ? "#e0e0e0" : this.colorScale(+d.data[crimeAttr]))
+                    .attr("fill", d => d.children ? "#e0e0e0" : this.colorScale(d.data[crimeAttr]))
                     .attr("stroke", d => d.children ? "#ccc" : "none")
                     .style("opacity", this.defaultOpacity)
                     .transition().duration(1000)
@@ -105,7 +105,7 @@ class CirclePackD3 {
                     .attr("transform", d => `translate(${d.x},${d.y})`)
                     .select("circle")
                     .attr("r", d => d.r)
-                    .attr("fill", d => d.children ? "#e0e0e0" : this.colorScale(+d.data[crimeAttr]));
+                    .attr("fill", d => d.children ? "#e0e0e0" : this.colorScale(d.data[crimeAttr]));
             },
             exit => {
                 exit.transition().duration(500)
@@ -131,6 +131,21 @@ class CirclePackD3 {
                 if (!isBrushActive) return 0;
                 return selectedItemIds.includes(d.data.index) ? 2 : 0;
             });
+        this.g.selectAll(".city-label").remove();
+
+        if (selectedItemIds && selectedItemIds.length === 1) {
+            this.g.selectAll(".node-leaf")
+                .filter(d => selectedItemIds.includes(d.data.index))
+                .append("text")
+                .attr("class", "city-label")
+                .attr("dy", "-1em")
+                .style("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("font-weight", "bold")
+                .style("fill", "#000")
+                .style("pointer-events", "none")
+                .text(d => d.data.communityname);
+        }
     }
 
     highlightHoveredItem = function(hoveredItemId) {

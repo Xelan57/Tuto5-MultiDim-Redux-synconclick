@@ -87,11 +87,13 @@ function ScatterplotContainer({xAttributeName, yAttributeName}){
 
     useEffect(() => {
         const scatterplotD3 = scatterplotD3Ref.current;
+        
         if (scatterplotD3) {
             const hoveredId = hoveredItem ? hoveredItem.index : null;
-            scatterplotD3.highlightHoveredItem(hoveredId);
+            const selectedIds = selectedItems ? selectedItems.map(item => item.index) : [];
+            scatterplotD3.highlightHoveredItem(hoveredId, selectedIds);
         }
-    }, [hoveredItem]);
+    }, [hoveredItem, selectedItems]);
 
     return(
         <div ref={divContainerRef} className="scatterplotDivContainer col2">

@@ -119,7 +119,6 @@ class CirclePackD3 {
         const isBrushActive = selectedItemIds && selectedItemIds.length > 0;
 
         this.g.selectAll(".node-leaf circle")
-            .transition().duration(200)
             .style("opacity", (d) => {
                 if (!isBrushActive) return this.defaultOpacity;
                 return selectedItemIds.includes(d.data.index) ? 1 : 0.1;
@@ -136,7 +135,6 @@ class CirclePackD3 {
 
     highlightHoveredItem = function(hoveredItemId) {
         this.g.selectAll(".node-leaf circle")
-            .transition().duration(150)
             .attr("stroke", (d) => d.data.index === hoveredItemId ? "black" : "none")
             .attr("stroke-width", (d) => d.data.index === hoveredItemId ? 4 : 0);
     }

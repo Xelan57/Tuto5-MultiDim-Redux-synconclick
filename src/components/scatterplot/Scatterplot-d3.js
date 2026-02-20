@@ -78,13 +78,27 @@ class ScatterplotD3 {
             .attr("stroke-width", (d) => selectedIds.includes(d.index) ? 2 : 0)
     }
 
-    highlightHoveredItem = function(hoveredItemId) {
+    highlightHoveredItem = function(hoveredItemId, selectedIds = []) {
+        
         this.svg.selectAll(".markerCircle")
             .transition().duration(150)
-            .attr("r", (itemData) => itemData.index === hoveredItemId ? 8 : this.circleRadius)
-            .attr("stroke", (itemData) => itemData.index === hoveredItemId ? "black" : "red")
-            .attr("stroke-width", (itemData) => itemData.index === hoveredItemId ? 3 : 0)
-            .attr("fill", (itemData) => itemData.index === hoveredItemId ? "red" : "black");
+            .attr("r", (d) => {
+                if (d.index === hoveredItemId || selectedIds.includes(d.index)) return 8;
+                return this.circleRadius;
+            })
+            .attr("fill", (d) => {
+                if (d.index === hoveredItemId || selectedIds.includes(d.index)) return "red";
+                return "black";
+            })
+            .attr("stroke", (d) => {
+                if (d.index === hoveredItemId || selectedIds.includes(d.index)) return "black";
+                return "red";
+            })
+            .attr("stroke-width", (d) => {
+                if (d.index === hoveredItemId) return 3;
+                if (selectedIds.includes(d.index)) return 2;
+                return 0;
+            });
     }
 
     updateAxis = function(visData, xAttribute, yAttribute){

@@ -63,11 +63,15 @@ function ScatterplotContainer({xAttributeName, yAttributeName}){
         const handleOnMouseLeave = function(){
             dispatch(setHoveredItem(null));
         }
+        const handleBrush = function(items){
+            dispatch(setSelectedItems(items)); 
+        }
 
         const controllerMethods={
             handleOnClick,
             handleOnMouseEnter,
-            handleOnMouseLeave
+            handleOnMouseLeave,
+            handleBrush
         }
 
         // get the current instance of scatterplotD3 from the Ref...

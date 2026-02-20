@@ -71,20 +71,20 @@ class ScatterplotD3 {
         this.changeBorderAndOpacity(selection, false);
     }
 
-    // highlight items selected by the brush
-    highlightSelectedItems(selectedItemIds) {
-        const isBrushActive = selectedItemIds && selectedItemIds.length > 0;
+    highlightSelectedItems = function(selectedIds) {
+        this.svg.selectAll(".markerCircle")
+            .attr("fill", (d) => selectedIds.includes(d.index) ? "red" : "black")
+            .attr("stroke", (d) => selectedIds.includes(d.index) ? "black" : "red")
+            .attr("stroke-width", (d) => selectedIds.includes(d.index) ? 2 : 0)
+    }
 
-        this.svg.selectAll(".markerG")
-            .style("opacity", (itemData) => {
-                if (!isBrushActive) return this.defaultOpacity;
-                return selectedItemIds.includes(itemData.index) ? 1 : 0.1;
-            })
-            .select(".markerCircle")
-            .attr("stroke-width", (itemData) => {
-                if (!isBrushActive) return 0;
-                return selectedItemIds.includes(itemData.index) ? 2 : 0;
-            });
+    highlightHoveredItem = function(hoveredItemId) {
+        this.svg.selectAll(".markerCircle")
+            .transition().duration(150)
+            .attr("r", (itemData) => itemData.index === hoveredItemId ? 8 : this.circleRadius)
+            .attr("stroke", (itemData) => itemData.index === hoveredItemId ? "black" : "red")
+            .attr("stroke-width", (itemData) => itemData.index === hoveredItemId ? 3 : 0)
+            .attr("fill", (itemData) => itemData.index === hoveredItemId ? "red" : "black");
     }
 
     updateAxis = function(visData, xAttribute, yAttribute){
@@ -122,9 +122,16 @@ class ScatterplotD3 {
                         .attr("class","markerG")
                         .style("opacity", this.defaultOpacity)
                         .on("click", (event, itemData) => {
-                            if(controllerMethods.handleOnClick) {
+                            if(controllerMethods.handleOnClick)
                                 controllerMethods.handleOnClick(itemData);
-                            }
+                        })
+                        .on("mouseenter", (event, itemData) => {
+                            if(controllerMethods.handleOnMouseEnter)
+                                controllerMethods.handleOnMouseEnter(itemData);
+                        })
+                        .on("mouseleave", (event, itemData) => {
+                            if(controllerMethods.handleOnMouseLeave)
+                                controllerMethods.handleOnMouseLeave();
                         });
 
                     itemG.append("circle")
@@ -159,7 +166,7 @@ class ScatterplotD3 {
                 const cy = this.yScale(item[yAttribute]);
                 return cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
             });
-            
+
             const selectedIds = selectedItems.map(item => item.index);
             this.highlightSelectedItems(selectedIds);
 
@@ -169,7 +176,7 @@ class ScatterplotD3 {
         });
 
         this.brushG.call(this.brush);
-        this.brushG.raise();
+        this.svg.selectAll(".markerG").raise();
     }
 
     clear = function(){

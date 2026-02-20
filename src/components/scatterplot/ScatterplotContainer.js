@@ -5,11 +5,12 @@ import {useSelector, useDispatch} from 'react-redux'
 import ScatterplotD3 from './Scatterplot-d3';
 
 // TODO: import action methods from reducers
-import { setSelectedItems } from '../../redux/ItemInteractionSlice'
+import { setSelectedItems, setHoveredItem } from '../../redux/ItemInteractionSlice'
 
 function ScatterplotContainer({xAttributeName, yAttributeName}){
     const visData = useSelector(state =>state.dataSet)
     const selectedItems = useSelector(state => state.itemInteraction.selectedItems);
+    const hoveredItem = useSelector(state => state.itemInteraction.hoveredItem);
     const dispatch = useDispatch();
 
     // every time the component re-render
@@ -57,8 +58,10 @@ function ScatterplotContainer({xAttributeName, yAttributeName}){
             dispatch(setSelectedItems([itemData]))
         }
         const handleOnMouseEnter = function(itemData){
+            dispatch(setHoveredItem(itemData));
         }
         const handleOnMouseLeave = function(){
+            dispatch(setHoveredItem(null));
         }
 
         const controllerMethods={
@@ -77,6 +80,14 @@ function ScatterplotContainer({xAttributeName, yAttributeName}){
         const scatterplotD3 = scatterplotD3Ref.current;
         scatterplotD3.highlightSelectedItems(selectedItems);
     },[selectedItems])
+
+    useEffect(() => {
+        const scatterplotD3 = scatterplotD3Ref.current;
+        if (scatterplotD3) {
+            const hoveredId = hoveredItem ? hoveredItem.index : null;
+            scatterplotD3.highlightHoveredItem(hoveredId);
+        }
+    }, [hoveredItem]);
 
     return(
         <div ref={divContainerRef} className="scatterplotDivContainer col2">

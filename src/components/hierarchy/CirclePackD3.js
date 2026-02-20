@@ -79,9 +79,16 @@ class CirclePackD3 {
                     .attr("class", d => d.children ? "nodeG node-parent" : "nodeG node-leaf")
                     .attr("transform", d => `translate(${d.x},${d.y})`)
                     .on("click", (event, d) => {
-                        if (!d.children && controllerMethods?.handleOnClick) {
+                        if (!d.children && controllerMethods?.handleOnClick)
                             controllerMethods.handleOnClick(d.data);
-                        }
+                    })
+                    .on("mouseenter", (event, d) => {
+                        if (!d.children && controllerMethods?.handleOnMouseEnter)
+                            controllerMethods.handleOnMouseEnter(d.data);
+                    })
+                    .on("mouseleave", (event, d) => {
+                        if (!d.children && controllerMethods?.handleOnMouseLeave)
+                            controllerMethods.handleOnMouseLeave();
                     });
 
                 nodeG.append("circle")
@@ -106,6 +113,32 @@ class CirclePackD3 {
                 exit.transition().duration(500).remove();
             }
         );
+    }
+
+    highlightSelectedItems = function(selectedItemIds) {
+        const isBrushActive = selectedItemIds && selectedItemIds.length > 0;
+
+        this.g.selectAll(".node-leaf circle")
+            .transition().duration(200)
+            .style("opacity", (d) => {
+                if (!isBrushActive) return this.defaultOpacity;
+                return selectedItemIds.includes(d.data.index) ? 1 : 0.1;
+            })
+            .attr("stroke", (d) => {
+                if (!isBrushActive) return "none";
+                return selectedItemIds.includes(d.data.index) ? "#000" : "none";
+            })
+            .attr("stroke-width", (d) => {
+                if (!isBrushActive) return 0;
+                return selectedItemIds.includes(d.data.index) ? 2 : 0;
+            });
+    }
+
+    highlightHoveredItem = function(hoveredItemId) {
+        this.g.selectAll(".node-leaf circle")
+            .transition().duration(150)
+            .attr("stroke", (d) => d.data.index === hoveredItemId ? "black" : "none")
+            .attr("stroke-width", (d) => d.data.index === hoveredItemId ? 4 : 0);
     }
 
     clear = function(){

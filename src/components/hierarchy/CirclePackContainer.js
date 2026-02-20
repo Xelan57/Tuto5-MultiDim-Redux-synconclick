@@ -5,11 +5,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import CirclePackD3 from './CirclePackD3';
 
 // TODO: import action methods from reducers
-import { setSelectedItems } from '../../redux/ItemInteractionSlice';
+import { setSelectedItems, setHoveredItem } from '../../redux/ItemInteractionSlice';
 
 function CirclePackContainer({ xAttributeName, yAttributeName }) {
     const visData = useSelector(state => state.dataSet);
     const selectedItems = useSelector(state => state.itemInteraction.selectedItems);
+    const hoveredItem = useSelector(state => state.itemInteraction.hoveredItem);
     const dispatch = useDispatch();
 
     // every time the component re-render
@@ -60,8 +61,10 @@ function CirclePackContainer({ xAttributeName, yAttributeName }) {
             dispatch(setSelectedItems([itemData]));
         }
         const handleOnMouseEnter = function (itemData) {
+            dispatch(setHoveredItem(itemData));
         }
         const handleOnMouseLeave = function () {
+            dispatch(setHoveredItem(null));
         }
 
         const controllerMethods = {
@@ -85,6 +88,14 @@ function CirclePackContainer({ xAttributeName, yAttributeName }) {
             circlePackD3.highlightSelectedItems(selectedIds);
         }
     }, [selectedItems]);
+
+    useEffect(() => {
+        const circlePackD3 = circlePackD3Ref.current;
+        if (circlePackD3) {
+            const hoveredId = hoveredItem ? hoveredItem.index : null;
+            circlePackD3.highlightHoveredItem(hoveredId);
+        }
+    }, [hoveredItem]);
 
     return (
         <div ref={divContainerRef} className="circlePackDivContainer col2">

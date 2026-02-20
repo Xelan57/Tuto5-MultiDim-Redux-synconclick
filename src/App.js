@@ -19,11 +19,7 @@ function App() {
   return (
     <div className="App">
         <div id={"MultiviewContainer"} className={"row"}>
-          {/*<ScatterplotContainer xAttributeName={"Temperature"} yAttributeName={"RentedBikeCount"}/>
-          <ScatterplotContainer xAttributeName={"Humidity"} yAttributeName={"RentedBikeCount"}/>*/}
           <ScatterplotContainer xAttributeName={"population"} yAttributeName={"ViolentCrimesPerPop"}/>
-          <ScatterplotContainer xAttributeName={"medIncome"} yAttributeName={"ViolentCrimesPerPop"}/>
-
         </div>
     </div>
   );
